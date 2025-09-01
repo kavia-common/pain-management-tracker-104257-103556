@@ -1,8 +1,13 @@
+import os
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.db import get_db, engine, Base
+from src.api.routers import auth
+
+# Get CORS origins from environment
+CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
 
 app = FastAPI(
     title="Pain Management API",
@@ -10,13 +15,17 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type"],
 )
+
+# Include routers
+app.include_router(auth.router)
 
 @app.on_event("startup")
 async def startup():
