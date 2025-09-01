@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.db import get_db, engine, Base
-from src.api.routers import auth, pain_events
+from src.api.routers import auth, pain_events, providers
 
 # Get CORS origins from environment
 CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
@@ -27,6 +27,7 @@ app.add_middleware(
 # Include routers
 app.include_router(auth.router)
 app.include_router(pain_events.router)
+app.include_router(providers.router)
 
 @app.on_event("startup")
 async def startup():
