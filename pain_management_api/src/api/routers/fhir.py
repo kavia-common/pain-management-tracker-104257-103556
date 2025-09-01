@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -6,6 +6,7 @@ from sqlalchemy import select
 from src.api.db import get_db
 from src.api.models import User, PainEvent, FHIRExport
 from src.api.deps import get_current_user
+from src.api.schemas import FHIRExportInDB
 from src.api.fhir_mapper import create_fhir_bundle, map_pain_event_to_observation
 
 router = APIRouter(prefix="/fhir", tags=["fhir"])
@@ -14,7 +15,7 @@ router = APIRouter(prefix="/fhir", tags=["fhir"])
 async def export_fhir_bundle(
     current_user: Annotated[User, Depends(get_current_user)],
     db: AsyncSession = Depends(get_db)
-):
+) -> Dict[str, Any]:
     """
     Export all user data and pain events as a FHIR Bundle.
     
@@ -39,7 +40,7 @@ async def export_pain_event(
     pain_event_id: int,
     current_user: Annotated[User, Depends(get_current_user)],
     db: AsyncSession = Depends(get_db)
-):
+) -> FHIRExportInDB:
     """
     Export a specific pain event as a FHIR Observation resource.
     
